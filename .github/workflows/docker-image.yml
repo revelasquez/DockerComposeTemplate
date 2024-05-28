@@ -21,7 +21,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build and push server image
       - name: Build and push server image
         uses: docker/build-push-action@v4
         with:
@@ -30,7 +29,6 @@ jobs:
           push: true
           tags: revelasquez76226637/server:latest
 
-      # Build and push php image
       - name: Build and push php image
         uses: docker/build-push-action@v4
         with:
@@ -38,14 +36,14 @@ jobs:
           file: ./dockerfiles/php.dockerfile
           push: true
           tags: revelasquez76226637/php:latest
-
-      # Run commands inside Docker server container
-      - name: Execute commands in server container
+      
+      # Run commands inside Docker php container
+      - name: Execute commands in php container
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/var/www/html \
             -w /var/www/html \
-            revelasquez76226637/server:latest \
+            revelasquez76226637/php:latest \
             sh -c '
               cp .env.example .env &&
               composer install --no-dev --optimize-autoloader &&
