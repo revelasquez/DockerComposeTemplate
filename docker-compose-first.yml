@@ -1,0 +1,48 @@
+version: '3'
+
+networks:
+  cicd:
+
+
+services:
+  server:
+    build:
+      context: ./dockerfiles
+      dockerfile: nginx.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    ports:
+      - "8090:80"
+    volumes:
+      - ./src:/var/www/html:delegated
+    depends_on:
+      - php
+      - redis
+    container_name: docker-cicd-server
+    networks:
+      - cicd
+
+  php:
+    build:
+      context: ./dockerfiles
+      dockerfile: php.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    ports:
+      - "9010:9000"
+    volumes:
+      - ./src:/var/www/html:delegated
+    container_name: docker-cicd-php
+    networks:
+      - cicd
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - "6390:6379"
+    container_name: docker-cicd-redis
+    networks:
+      - cicd
