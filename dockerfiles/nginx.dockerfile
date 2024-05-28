@@ -3,8 +3,8 @@ FROM nginx:stable-alpine
 ARG UID
 ARG GID
 
-ENV UID=${UID}
-ENV GID=${GID}
+ENV UID=1000
+ENV GID=1000
 
 # MacOS staff group's gid is 20, so is the dialout group in alpine linux. We're not using it, let's just remove it.
 RUN delgroup dialout
