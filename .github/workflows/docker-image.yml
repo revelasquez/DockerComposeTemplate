@@ -27,6 +27,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}/src:/var/www/html \
             -w /var/www/html \
+            --user laravel \
             revelasquez76226637/laravel:latest \
             sh -c '
               ls -la &&  # Listar archivos para verificar la existencia de .env.example
