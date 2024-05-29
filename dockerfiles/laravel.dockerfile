@@ -1,36 +1,39 @@
+# Use PHP 8 FPM Alpine as base image
 FROM php:8-fpm-alpine
 
-ARG UID
-ARG GID
+# Arguments for UID and GID (default to 1000 if not provided)
+ARG UID=1000
+ARG GID=1000
 
-ENV UID=1000
-ENV GID=1000
+# Ensure www-data user and group are replaced with laravel user and group
+RUN sed -i "s/user = www-data/user = laravel/g" /usr/local/etc/php-fpm.d/www.conf \
+    && sed -i "s/group = www-data/group = laravel/g" /usr/local/etc/php-fpm.d/www.conf
 
-RUN mkdir -p /var/www/html
-
-WORKDIR /var/www/html
-
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
-
-# MacOS staff group's gid is 20, so is the dialout group in alpine linux. We're not using it, let's just remove it.
-RUN delgroup dialout
-
-RUN addgroup -g ${GID} --system laravel
-RUN adduser -G laravel --system -D -s /bin/sh -u ${UID} laravel
-
-RUN sed -i "s/user = www-data/user = laravel/g" /usr/local/etc/php-fpm.d/www.conf
-RUN sed -i "s/group = www-data/group = laravel/g" /usr/local/etc/php-fpm.d/www.conf
-RUN echo "php_admin_flag[log_errors] = on" >> /usr/local/etc/php-fpm.d/www.conf
-
-RUN apk add --no-cache postgresql-dev \
+# Install required PHP extensions and packages
+RUN apk add --no-cache \
+        postgresql-dev \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
-    && docker-php-ext-install pdo pdo_pgsql
-
-RUN mkdir -p /usr/src/php/ext/redis \
+    && docker-php-ext-install pdo pdo_pgsql \
+    && mkdir -p /usr/src/php/ext/redis \
     && curl -L https://github.com/phpredis/phpredis/archive/5.3.4.tar.gz | tar xvz -C /usr/src/php/ext/redis --strip 1 \
     && echo 'redis' >> /usr/src/php-available-exts \
     && docker-php-ext-install redis
-    
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
+# Create laravel user and group with specified UID and GID
+RUN addgroup -g ${GID} --system laravel \
+    && adduser -u ${UID} -G laravel --system -D -s /bin/sh laravel
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Change ownership of working directory to laravel user
+RUN chown -R laravel:laravel /var/www/html
+
+# Ensure Laravel user is used for subsequent commands
 USER laravel
 
+# Default command to start PHP-FPM
 CMD ["php-fpm", "-y", "/usr/local/etc/php-fpm.conf", "-R"]
