@@ -21,23 +21,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push server image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./dockerfiles/nginx.dockerfile
-          push: true
-          tags: revelasquez76226637/server:latest
-
-      - name: Build and push php image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./dockerfiles/php.dockerfile
-          push: true
-          tags: revelasquez76226637/php:latest
-      
-      # Run commands inside Docker php container
+      # Run commands inside Docker php container and execute tests
       - name: Execute commands in php container
         run: |
           docker run --rm \
@@ -51,3 +35,23 @@ jobs:
               php artisan migrate --force &&
               php artisan test
             '
+
+      # Build and push server image
+      - name: Build and push server image
+        if: success()  # Ensure this step runs only if the previous step succeeded
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./dockerfiles/nginx.dockerfile
+          push: true
+          tags: revelasquez76226637/server:latest
+
+      # Build and push php image
+      - name: Build and push php image
+        if: success()  # Ensure this step runs only if the previous step succeeded
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./dockerfiles/php.dockerfile
+          push: true
+          tags: revelasquez76226637/php:latest
