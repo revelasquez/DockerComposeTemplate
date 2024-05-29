@@ -25,15 +25,20 @@ jobs:
       - name: Execute commands in laravel container
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}:/var/www/html \
+            -v ${{ github.workspace }}/src:/var/www/html \
             -w /var/www/html \
             revelasquez76226637/laravel:latest \
             sh -c '
-              cp .env.example .env &&
-              composer install --no-dev --optimize-autoloader &&
-              php artisan key:generate &&
-              php artisan migrate --force &&
-              php artisan test
+              ls -la &&  # Listar archivos para verificar la existencia de .env.example
+              if [ -f .env.example ]; then
+                cp .env.example .env &&
+                composer install --no-dev --optimize-autoloader &&
+                php artisan key:generate &&
+                php artisan migrate --force &&
+                php artisan test
+              else
+                echo ".env.example file not found" && exit 1
+              fi
             '
 
       # Build and push server image
