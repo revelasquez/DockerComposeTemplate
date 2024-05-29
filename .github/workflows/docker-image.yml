@@ -34,6 +34,7 @@ jobs:
               if [ -f .env.example ]; then
                 cp .env.example .env &&
                 chmod 777 .env &&
+                composer update &&
                 composer install --no-dev --optimize-autoloader &&
                 php artisan key:generate &&
                 php artisan migrate --force &&
