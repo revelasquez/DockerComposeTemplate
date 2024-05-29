@@ -34,16 +34,26 @@ jobs:
               if [ -f .env.example ]; then
                 cp .env.example .env &&
                 chmod 777 .env &&
-                composer install --no-dev --optimize-autoloader &&
+                composer install &&
                 php artisan key:generate &&
-                php artisan migrate --force
+                php artisan migrate --force &&
+                ./vendor/bin/phpunit
               else
                 echo ".env.example file not found" && exit 1
               fi
             '
-      - name: Execute test
-        run: docker-compose exec -it docker-laravel php artisan test
 
+      - name: Run tests
+        run: |
+            docker run --rm \
+            -v ${{ github.workspace }}/src:/var/www/html \
+            -w /var/www/html \
+            --user root \
+            revelasquez76226637/laravel:latest \
+            php artisan test \
+            ./vendor/bin/pest --init
+
+        
       # Build and push server image
       - name: Build and push server image
         if: success()  # Asegura que este paso se ejecute solo si el paso anterior tuvo éxito
