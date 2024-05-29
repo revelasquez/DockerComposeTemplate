@@ -32,6 +32,7 @@ jobs:
               ls -la &&  # Listar archivos para verificar la existencia de .env.example
               if [ -f .env.example ]; then
                 cp .env.example .env &&
+                chmod 777 .env &&  # Asegurar permisos de escritura para todos los usuarios
                 composer install --no-dev --optimize-autoloader &&
                 php artisan key:generate &&
                 php artisan migrate --force &&
@@ -43,7 +44,7 @@ jobs:
 
       # Build and push server image
       - name: Build and push server image
-        if: success()  # Ensure this step runs only if the previous step succeeded
+        if: success()  # Asegura que este paso se ejecute solo si el paso anterior tuvo éxito
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -53,7 +54,7 @@ jobs:
 
       # Build and push laravel image
       - name: Build and push laravel image
-        if: success()  # Ensure this step runs only if the previous step succeeded
+        if: success()  # Asegura que este paso se ejecute solo si el paso anterior tuvo éxito
         uses: docker/build-push-action@v4
         with:
           context: .
