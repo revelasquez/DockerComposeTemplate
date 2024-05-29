@@ -37,7 +37,7 @@ jobs:
                 composer install --no-dev --optimize-autoloader &&
                 php artisan key:generate &&
                 php artisan migrate --force &&
-                php artisan test
+                ./vendor/bin/phpunit
               else
                 echo ".env.example file not found" && exit 1
               fi
