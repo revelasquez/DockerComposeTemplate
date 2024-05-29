@@ -31,7 +31,7 @@ jobs:
             sh -c '
               ls -la &&  # Listar archivos para verificar la existencia de .env.example
               if [ -f .env.example ]; then
-                cp .env.example .env &&
+                sudo cp .env.example .env &&
                 composer install --no-dev --optimize-autoloader &&
                 php artisan key:generate &&
                 php artisan migrate --force &&
