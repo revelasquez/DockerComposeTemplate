@@ -7,18 +7,18 @@ services:
   server:
     image: revelasquez76226637/server:latest
     ports:
-      - "8085:80"
+      - "8090:80"
     volumes:
       - ./src:/var/www/html:delegated
     depends_on:
-      - php
+      - laravel
       - redis
     container_name: server
     networks:
       - laravel
 
-  php:
-    image: revelasquez76226637/php:latest
+  laravel:
+    image: revelasquez76226637/laravel:latest
     ports:
       - "9005:9000"
     volumes:

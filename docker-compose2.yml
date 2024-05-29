@@ -3,7 +3,6 @@ version: '3'
 networks:
   cicd:
 
-
 services:
   server:
     build:
@@ -13,20 +12,20 @@ services:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
     ports:
-      - "8090:80"
+      - "8085:80"
     volumes:
       - ./src:/var/www/html:delegated
     depends_on:
-      - php
+      - laravel
       - redis
-    container_name: docker-cicd-server
+    container_name: docker-server
     networks:
       - cicd
 
-  php:
+  laravel:
     build:
       context: ./dockerfiles
-      dockerfile: php.dockerfile
+      dockerfile: laravel.dockerfile
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
@@ -34,7 +33,7 @@ services:
       - "9010:9000"
     volumes:
       - ./src:/var/www/html:delegated
-    container_name: docker-cicd-php
+    container_name: docker-laravel
     networks:
       - cicd
 
@@ -43,6 +42,6 @@ services:
     restart: unless-stopped
     ports:
       - "6390:6379"
-    container_name: docker-cicd-redis
+    container_name: docker-redis
     networks:
       - cicd
