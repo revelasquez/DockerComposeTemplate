@@ -50,8 +50,7 @@ jobs:
             -w /var/www/html \
             --user root \
             revelasquez76226637/laravel:latest \
-            php artisan test \
-            ./vendor/bin/pest --init
+            php artisan test
 
         
       # Build and push server image
