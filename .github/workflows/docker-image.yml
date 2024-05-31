@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "${{ secrets.VPN_CONFIG }}" > client.ovpn
           sudo openvpn --config client.ovpn &
-          sleep 30  # Esperar para que la conexión VPN se establezca
+          sleep 60  # Aumenta el tiempo de espera si es necesario
 
       - name: Set up .env
         run: |
