@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "${{ secrets.VPN_CONFIG }}" > client.ovpn
           sudo openvpn --config client.ovpn &
-          sleep 120
+          sleep 60
           ping -c 4 ${{ secrets.DB_HOST }}
 
       - name: Set up .env
