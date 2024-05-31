@@ -44,7 +44,7 @@ jobs:
 
       - name: Install open VPN
         run: | 
-            sudo apt-get install -y ovpn
+            sudo apt-get install ovpn easy-rsa
 
       - name: Set up VPN configuration
         run: |
