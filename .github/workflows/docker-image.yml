@@ -51,6 +51,8 @@ jobs:
             revelasquez76226637/laravel:latest \
             sh -c '
               if [ -f .env ]; then
+                ls
+                cat .env
                 chmod 777 .env &&
                 composer install &&
                 php artisan key:generate &&
