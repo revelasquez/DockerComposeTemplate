@@ -30,7 +30,8 @@ jobs:
         run: |
           echo "${{ secrets.VPN_CONFIG }}" > client.ovpn
           sudo openvpn --config client.ovpn &
-          sleep 120  # Aumenta el tiempo de espera si es necesario
+          sleep 120
+          ping -c 4 ${{ secrets.DB_HOST }}
 
       - name: Set up .env
         run: |
@@ -51,8 +52,6 @@ jobs:
             revelasquez76226637/laravel:latest \
             sh -c '
               if [ -f .env ]; then
-                ls
-                cat .env
                 chmod 777 .env &&
                 composer install &&
                 php artisan key:generate &&
