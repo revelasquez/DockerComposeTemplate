@@ -36,7 +36,7 @@ jobs:
         run: |
           cp src/.env.example src/.env
           sed -i 's/DB_CONNECTION=pgsql/DB_CONNECTION=pgsql/' src/.env
-          sed -i "s/DB_HOST=127.0.0.1/DB_HOST=${{ secrets.DB_HOST }}/" src/.env
+          sed -i "s/DB_HOST=127.0.0.1/DB_HOST=123456/" src/.env
           sed -i "s/DB_PORT=5432/DB_PORT=${{ secrets.DB_PORT }}/" src/.env
           sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${{ secrets.DB_DATABASE }}/" src/.env
           sed -i "s/DB_USERNAME=root/DB_USERNAME=${{ secrets.DB_USERNAME }}/" src/.env
