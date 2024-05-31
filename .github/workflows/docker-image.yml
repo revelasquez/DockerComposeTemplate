@@ -21,26 +21,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Run commands inside Docker laravel container and execute tests
-      - name: Execute commands in laravel container
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}/src:/var/www/html \
-            -w /var/www/html \
-            --user root \
-            revelasquez76226637/laravel:latest \
-            sh -c '
-              ls -la &&  # Listar archivos para verificar la existencia de .env.example
-              if [ -f .env.example ]; then
-                cp .env.example .env &&
-                chmod 777 .env &&
-                composer install &&
-                php artisan key:generate &&
-                ./vendor/bin/phpunit
-              else
-                echo ".env.example file not found" && exit 1
-              fi
-            '
 
       - name: Install open VPN
         run: | 
@@ -62,8 +42,28 @@ jobs:
           sed -i "s/DB_USERNAME=root/DB_USERNAME=${{secrets.DB_USERNAME}}/" src/.env
           sed -i "s/DB_PASSWORD=root/DB_PASSWORD=${{secrets.DB_PASSWORD}}/" src/.env
 
-      - name: Run database migrations
-        run: php artisan migrate --force
+
+          # Run commands inside Docker laravel container and execute tests
+      - name: Execute commands in laravel container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/src:/var/www/html \
+            -w /var/www/html \
+            --user root \
+            revelasquez76226637/laravel:latest \
+            sh -c '
+              ls -la &&  # Listar archivos para verificar la existencia de .env.example
+              if [ -f .env.example ]; then
+                cp .env.example .env &&
+                chmod 777 .env &&
+                composer install &&
+                php artisan key:generate &&
+                php artisan migrate --force &&
+                ./vendor/bin/phpunit
+              else
+                echo ".env.example file not found" && exit 1
+              fi
+            '
 
       - name: Run tests
         run: |
