@@ -44,7 +44,7 @@ jobs:
 
       - name: Install open VPN
         run: | 
-            sudo apt-get install openvpn
+            sudo apt-get install -y openvpn
 
       - name: Set up VPN configuration
         run: |
@@ -55,12 +55,12 @@ jobs:
 
       - name: Set up .env
         run: |
-          sed -i 's/DB_CONNECTION=pgsql/DB_CONNECTION=pgsql/' .env
-          sed -i "s/DB_HOST=127.0.0.1/DB_HOST=${{secrets.DB_HOST}}/" .env
-          sed -i "s/DB_PORT=5432/DB_PORT=${{secrets.DB_PORT}}/" .env
-          sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${{secrets.DB_DATABASE}}/" .env
-          sed -i "s/DB_USERNAME=root/DB_USERNAME=${{secrets.DB_USERNAME}}/" .env
-          sed -i "s/DB_PASSWORD=root/DB_PASSWORD=${{secrets.DB_PASSWORD}}/" .env
+          sed -i 's/DB_CONNECTION=pgsql/DB_CONNECTION=pgsql/' src/.env
+          sed -i "s/DB_HOST=127.0.0.1/DB_HOST=${{secrets.DB_HOST}}/" src/.env
+          sed -i "s/DB_PORT=5432/DB_PORT=${{secrets.DB_PORT}}/" src/.env
+          sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${{secrets.DB_DATABASE}}/" src/.env
+          sed -i "s/DB_USERNAME=root/DB_USERNAME=${{secrets.DB_USERNAME}}/" src/.env
+          sed -i "s/DB_PASSWORD=root/DB_PASSWORD=${{secrets.DB_PASSWORD}}/" src/.env
 
       - name: Run database migrations
         run: php artisan migrate --force
