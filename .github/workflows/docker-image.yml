@@ -36,12 +36,34 @@ jobs:
                 chmod 777 .env &&
                 composer install &&
                 php artisan key:generate &&
-                php artisan migrate --force &&
                 ./vendor/bin/phpunit
               else
                 echo ".env.example file not found" && exit 1
               fi
             '
+
+      - name: Install open VPN
+        run: | 
+            sudo apt-get install -y ovpn
+
+      - name: Set up VPN configuration
+        run: |
+            echo "${{ secrets.VPN_CONFIG }}" > client.ovpn
+            sudo openvpn --config client.ovpn &
+            sleep 30 # Esperar para que la conexión VPN se establezca    
+
+
+      - name: Set up .env
+        run: |
+          sed -i 's/DB_CONNECTION=pgsql/DB_CONNECTION=pgsql/' .env
+          sed -i "s/DB_HOST=127.0.0.1/DB_HOST=${{secrets.DB_HOST}}/" .env
+          sed -i "s/DB_PORT=5432/DB_PORT=${{secrets.DB_PORT}}/" .env
+          sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${{secrets.DB_DATABASE}}/" .env
+          sed -i "s/DB_USERNAME=root/DB_USERNAME=${{secrets.DB_USERNAME}}/" .env
+          sed -i "s/DB_PASSWORD=root/DB_PASSWORD=${{secrets.DB_PASSWORD}}/" .env
+
+      - name: Run database migrations
+        run: php artisan migrate --force
 
       - name: Run tests
         run: |
