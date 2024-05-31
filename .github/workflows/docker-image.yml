@@ -21,30 +21,28 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-
-      - name: Install open VPN
-        run: | 
-            sudo apt-get install -y openvpn
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openvpn
 
       - name: Set up VPN configuration
         run: |
-            echo "${{ secrets.VPN_CONFIG }}" > client.ovpn
-            sudo openvpn --config client.ovpn &
-            sleep 30 # Esperar para que la conexión VPN se establezca    
-
+          echo "${{ secrets.VPN_CONFIG }}" > client.ovpn
+          sudo openvpn --config client.ovpn &
+          sleep 30  # Esperar para que la conexión VPN se establezca
 
       - name: Set up .env
         run: |
+          cp src/.env.example src/.env
           sed -i 's/DB_CONNECTION=pgsql/DB_CONNECTION=pgsql/' src/.env
-          sed -i "s/DB_HOST=127.0.0.1/DB_HOST=${{secrets.DB_HOST}}/" src/.env
-          sed -i "s/DB_PORT=5432/DB_PORT=${{secrets.DB_PORT}}/" src/.env
-          sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${{secrets.DB_DATABASE}}/" src/.env
-          sed -i "s/DB_USERNAME=root/DB_USERNAME=${{secrets.DB_USERNAME}}/" src/.env
-          sed -i "s/DB_PASSWORD=root/DB_PASSWORD=${{secrets.DB_PASSWORD}}/" src/.env
+          sed -i "s/DB_HOST=127.0.0.1/DB_HOST=${{ secrets.DB_HOST }}/" src/.env
+          sed -i "s/DB_PORT=5432/DB_PORT=${{ secrets.DB_PORT }}/" src/.env
+          sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${{ secrets.DB_DATABASE }}/" src/.env
+          sed -i "s/DB_USERNAME=root/DB_USERNAME=${{ secrets.DB_USERNAME }}/" src/.env
+          sed -i "s/DB_PASSWORD=root/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/" src/.env
 
-
-          # Run commands inside Docker laravel container and execute tests
-      - name: Execute commands in laravel container
+      - name: Execute commands in Laravel container
         run: |
           docker run --rm \
             -v ${{ github.workspace }}/src:/var/www/html \
@@ -52,32 +50,18 @@ jobs:
             --user root \
             revelasquez76226637/laravel:latest \
             sh -c '
-              ls -la &&  # Listar archivos para verificar la existencia de .env.example
-              if [ -f .env.example ]; then
-                cp .env.example .env &&
+              if [ -f .env ]; then
                 chmod 777 .env &&
                 composer install &&
                 php artisan key:generate &&
                 php artisan migrate --force &&
                 ./vendor/bin/phpunit
               else
-                echo ".env.example file not found" && exit 1
+                echo ".env file not found" && exit 1
               fi
             '
 
-      - name: Run tests
-        run: |
-            docker run --rm \
-            -v ${{ github.workspace }}/src:/var/www/html \
-            -w /var/www/html \
-            --user root \
-            revelasquez76226637/laravel:latest \
-            ./vendor/bin/pest --init
-
-        
-      # Build and push server image
       - name: Build and push server image
-        if: success()  # Asegura que este paso se ejecute solo si el paso anterior tuvo éxito
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -85,9 +69,7 @@ jobs:
           push: true
           tags: revelasquez76226637/server:latest
 
-      # Build and push laravel image
       - name: Build and push laravel image
-        if: success()  # Asegura que este paso se ejecute solo si el paso anterior tuvo éxito
         uses: docker/build-push-action@v4
         with:
           context: .
