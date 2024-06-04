@@ -31,8 +31,8 @@ jobs:
           echo '${{ secrets.VPN_CONFIG }}' > archivo.ovpn
           echo '${{ secrets.VPN_USERNAME }}' > vpn-credentials.txt
           echo '${{ secrets.VPN_PASSWORD }}' >> vpn-credentials.txt
+          cat vpn-credentials.txt
           sudo openvpn --config archivo.ovpn --auth-user-pass vpn-credentials.txt --daemon
-        
         
       - name: Verificar estado de OpenVPN
         run: |
