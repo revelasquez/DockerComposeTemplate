@@ -70,4 +70,12 @@ jobs:
           context: .
           file: ./dockerfiles/nginx.dockerfile
           push: true
-          tags: re
+          tags: revelasquez76226637/server:latest
+
+      - name: Build and push laravel image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./dockerfiles/laravel.dockerfile
+          push: true
+          tags: revelasquez76226637/laravel:latest
