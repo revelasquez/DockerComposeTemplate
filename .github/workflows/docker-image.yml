@@ -33,7 +33,6 @@ jobs:
           echo '${{ secrets.VPN_PASSWORD }}' >> vpn-credentials.txt
           sudo openvpn --config client.ovpn --auth-user-pass vpn-credentials.txt --daemon
           sleep 60
-          ping -c 4 ${{ secrets.DB_HOST }}
 
       - name: Set up .env
         run: |
