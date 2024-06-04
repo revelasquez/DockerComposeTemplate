@@ -37,6 +37,10 @@ jobs:
       - name: Verificar estado de OpenVPN
         run: |
           sudo systemctl status openvpn
+
+      - name: log del VPN
+        run: |
+          cat /var/log/openvpn.log
       
       - name: Verificar conexión VPN
         run: |
