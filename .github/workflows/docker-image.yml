@@ -35,13 +35,13 @@ jobs:
         
         
       - name: Verificar estado de OpenVPN
-          run: |
-            sudo systemctl status openvpn
+        run: |
+          sudo systemctl status openvpn
       
       - name: Verificar conexión VPN
-          run: |
-            sleep 60 # Esperar un tiempo para que la VPN se establezca completamente
-            ping -c 4 ${{ secrets.DB_HOST }}
+        run: |
+          sleep 60 # Esperar un tiempo para que la VPN se establezca completamente
+          ping -c 4 ${{ secrets.DB_HOST }}
 
       - name: Set up .env
         run: |
