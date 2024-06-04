@@ -28,10 +28,12 @@ jobs:
 
       - name: Set up VPN configuration
         run: |
-          echo "${{ secrets.VPN_CONFIG }}" > client.ovpn
-          sudo openvpn --config client.ovpn &
-          sleep 60
-          ping -c 4 ${{ secrets.DB_HOST }}
+            echo "${{ secrets.VPN_CONFIG }}" > client.ovpn
+            echo "${{ secrets.VPN_USERNAME }}" > vpn-credentials.txt
+            echo "${{ secrets.VPN_PASSWORD }}" >> vpn-credentials.txt
+            sudo openvpn --config client.ovpn --auth-user-pass vpn-credentials.txt &
+            sleep 60
+            ping -c 4 ${{ secrets.DB_HOST }}
 
       - name: Set up .env
         run: |
